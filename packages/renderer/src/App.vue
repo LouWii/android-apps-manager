@@ -1,20 +1,20 @@
 <template>
-  <img
-    alt="Vue logo"
-    src="../assets/logo.svg"
-    width="300"
-  >
-  <app-navigation />
-  <router-view />
+  <div class="app-container">
+    <devices />
+    <installed-apps />
+  </div>
 </template>
 
 <script lang="ts">
 import {defineComponent} from 'vue';
-import AppNavigation from '/@/components/AppNavigation.vue';
+import Devices from '/@/components/Devices.vue';
+import InstalledApps from '/@/components/InstalledApps.vue';
+
 export default defineComponent({
   name: 'App',
   components: {
-    AppNavigation,
+    Devices,
+    InstalledApps,
   },
 });
 </script>

@@ -1,7 +1,7 @@
-import {app, BrowserWindow} from 'electron';
+import {app, BrowserWindow, ipcMain} from 'electron';
 import {join} from 'path';
 import {URL} from 'url';
-
+import {listApps, listDevices} from './adb-helper';
 
 const isSingleInstance = app.requestSingleInstanceLock();
 
@@ -92,3 +92,10 @@ if (import.meta.env.PROD) {
     .catch((e) => console.error('Failed check updates:', e));
 }
 
+ipcMain.handle('app:list-devices', () => {
+  return listDevices();
+});
+
+ipcMain.handle('app:list-apps', (event, deviceId: string) => {
+  return listApps(deviceId);
+});

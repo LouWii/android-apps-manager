@@ -1,4 +1,4 @@
-import {contextBridge} from 'electron';
+import {contextBridge, ipcRenderer} from 'electron';
 
 const apiKey = 'electron';
 /**
@@ -7,6 +7,15 @@ const apiKey = 'electron';
 const api: ElectronApi = {
   versions: process.versions,
 };
+
+contextBridge.exposeInMainWorld('adbHelper', {
+  listDevices: () => {
+    return ipcRenderer.invoke('app:list-devices');
+  },
+  listApps: (deviceId: string) => {
+    return ipcRenderer.invoke('app:list-apps', deviceId);
+  },
+});
 
 /**
  * The "Main World" is the JavaScript context that your main renderer code runs in.
