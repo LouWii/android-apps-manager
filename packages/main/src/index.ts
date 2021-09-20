@@ -1,7 +1,7 @@
 import {app, BrowserWindow, ipcMain} from 'electron';
 import {join} from 'path';
 import {URL} from 'url';
-import {listApps, listDevices} from './adb-helper';
+import {getAppDetails, listApps, listDevices} from './adb-helper';
 
 const isSingleInstance = app.requestSingleInstanceLock();
 
@@ -98,4 +98,8 @@ ipcMain.handle('app:list-devices', () => {
 
 ipcMain.handle('app:list-apps', (event, deviceId: string) => {
   return listApps(deviceId);
+});
+
+ipcMain.handle('app:app-details', (event, deviceId: string, appName: string) => {
+  return getAppDetails(deviceId, appName);
 });

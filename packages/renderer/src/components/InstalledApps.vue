@@ -18,6 +18,9 @@
         class="app-item"
       >
         {{ app.key }}
+        <button @click="loadAppDetails(app.key)">
+          L
+        </button>
       </div>
     </div>
   </div>
@@ -26,7 +29,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapState } from 'vuex';
-import type { AndroidPackage } from '../../types';
+import type { AndroidPackage } from 'types';
 
 export default defineComponent({
   name: 'InstalledApps',
@@ -63,6 +66,24 @@ export default defineComponent({
           });
       }
     },
+    loadAppDetails(appName: string) {
+      console.log(appName);
+      window.adbHelper.getAppDetails(this.selectedDeviceId, appName)
+        .then(result => {
+          console.log(result);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
   },
 });
 </script>
+
+<style scoped>
+.app-item {
+  margin: 1rem 0;
+  width: 100%;
+  text-align: left;
+}
+</style>

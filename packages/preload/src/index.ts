@@ -15,6 +15,9 @@ contextBridge.exposeInMainWorld('adbHelper', {
   listApps: (deviceId: string) => {
     return ipcRenderer.invoke('app:list-apps', deviceId);
   },
+  getAppDetails: (deviceId: string, appName: string) => {
+    return ipcRenderer.invoke('app:app-details', deviceId, appName);
+  },
 });
 
 /**

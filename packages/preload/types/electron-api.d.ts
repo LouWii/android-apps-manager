@@ -5,7 +5,8 @@ interface ElectronApi {
 
 interface AdbHelper {
   readonly listDevices: () => Promise<string>
-  readonly listApps: (string) => Promise
+  readonly listApps: (string) => Promise<string[]>
+  readonly getAppDetails: (string, string) => Promise
 }
 
 declare interface Window {

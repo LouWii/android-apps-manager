@@ -6,7 +6,7 @@
         :key="device.id"
         :value="device.id"
       >
-        {{ getCleanDeviceModel(device.model) }}
+        {{ device.brand }} {{ device.name }}
       </option>
       <option v-if="!devices.length">
         No Devices
@@ -23,34 +23,23 @@
 import { defineComponent } from 'vue';
 import type {DeviceWithPath} from '@devicefarmer/adbkit';
 import androidDeviceList from 'android-device-list';
+import type { DeviceInfo } from 'types';
+import { mapState } from 'vuex';
 
 export default defineComponent({
   name: 'Devices',
   data() {
-    return {
-      devices: [] as Array<DeviceWithPath>,
-      localSelectedDeviceId: null,
-      deviceInfo: null,
-    };
+    return {};
   },
   computed: {
-    selectedDevice() {
-      return this.devices.find(d => d.id === this.localSelectedDeviceId);
-    },
-  },
-  watch: {
-    localSelectedDeviceId: function() {
-      this.$store.commit('setSelectedDeviceId', this.localSelectedDeviceId);
-      if (this.selectedDevice) {
-        const devicesInfo = androidDeviceList.getDevicesByDeviceId(this.selectedDevice.product.replace('product:', ''));
-        if (devicesInfo.length) {
-          this.deviceInfo = devicesInfo.find(Boolean);
-        } else {
-          this.deviceInfo = null;
-        }
-      } else {
-        this.deviceInfo = null;
-      }
+    ...mapState(['devices']),
+    localSelectedDeviceId: {
+      get() {
+        return this.$store.state.selectedDeviceId;
+      },
+      set(newValue) {
+        this.$store.commit('setSelectedDeviceId', newValue);
+      },
     },
   },
   mounted() {
@@ -59,12 +48,27 @@ export default defineComponent({
   methods: {
     fetchDevices() {
       window.adbHelper.listDevices()
-      .then((result: Array<DeviceWithPath>) => {
-        console.log(result);
-        this.devices = result;
+      .then((newDevices: Array<DeviceWithPath>) => {
+        const devicesInfo: DeviceInfo[] = [];
+        newDevices.forEach(d => {
+          const device: DeviceInfo = {
+            product: d.product.replace('product:', ''),
+            name: this.getCleanDeviceModel(d.model),
+            id: d.id,
+            brand: '',
+          };
+          const devicesExtraInfo = androidDeviceList.getDevicesByDeviceId(d.product.replace('product:', ''));
+          if (devicesExtraInfo.length) {
+            const deviceExtraInfo = devicesExtraInfo.find(Boolean);
+            device.name = deviceExtraInfo.name;
+            device.brand = deviceExtraInfo.brand;
+          }
+          devicesInfo.push(device);
+        });
+        this.$store.commit('setDevices', devicesInfo);
         if (this.devices.length) {
           // Select first item in the list
-          this.localSelectedDeviceId = this.devices.find(Boolean).id;
+          this.$store.commit('setSelectedDeviceId', this.devices.find(Boolean).id);
         }
       })
       .catch(error => {

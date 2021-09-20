@@ -22,6 +22,20 @@ export const listApps = function(id: string): Promise<string[]> {
   });
 };
 
+export const getAppDetails = function(id: string, appName: string) {
+  return new Promise((resolve, reject) => {
+    const deviceClient = adbCommand.getDevice(id);
+    if (!deviceClient) {
+      reject(`Client not found for id ${id}`);
+      return;
+    }
+    deviceClient.shell(`dumpsys package ${appName}`)
+      .then(Adb.util.readAll)
+      .then(output => resolve(output.toString()))
+      .catch(error => reject(error));
+  });
+};
+
 //export const listDevicesMan = function() {
 //  return new Promise((resolve, reject) => {
 //    child_process.exec(`${ADB_COMMAND} devices -l`, (error, stdout, stderr) => {
